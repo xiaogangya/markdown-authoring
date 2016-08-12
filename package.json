@@ -1,0 +1,43 @@
+{
+    "name": "markdown-authoring",
+    "displayName": "markdown-authoring",
+    "description": "A VS Code Extension of Markdown Authoring.",
+    "version": "0.0.1",
+    "publisher": "yanz",
+    "engines": {
+        "vscode": "^1.0.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.checkLinks"
+    ],
+    "main": "./src/extension",
+    "contributes": {
+        "commands": [{
+            "command": "extension.checkLinks",
+            "title": "Markdown: Check Links"
+        }],
+        "menus": {
+            "explorer/context": [{
+                "when": "resourceLangId == markdown",
+                "command": "extension.checkLinks",
+                "group": "navigation"
+            }]
+        },
+        "keybindings": [{
+            "when": "editorTextFocus && editorLangId == markdown",
+            "command": "extension.checkLinks",
+            "key": "alt+l",
+            "mac": "cmd+l"
+        }]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "vscode": "^0.11.0",
+        "marked": "^0.3.6"
+    }
+}
