@@ -1,43 +1,58 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import Markdown from '../utilities/markdown'
+import MarkdownHelper from '../utilities/markdown'
+
+let uuid = require('node-uuid')
 
 export default class LinkCommand {
-  static linkLocationList = new Array<vscode.Location>()
+  static results : Map<String, Array<vscode.Location>> = new Map<String, Array<vscode.Location>>()
 
-  static checkAll(): Thenable<void> {
-    LinkCommand.linkLocationList = new Array<vscode.Location>();
+  static putResult(result : Array<vscode.Location>) : string {
+    let key : string = uuid.v4()
+    LinkCommand.results["linkCheck:" + key] = result;
+    return key
+  }
 
+  static getResult(key : string) : Array<vscode.Location> {
+    return LinkCommand.results[key]
+  }
+
+  static deleteResult(key : string) {
+    LinkCommand.results.delete(key)
+  }
+
+  static checkAll(): Thenable<Array<vscode.Location>> {
     return vscode.workspace.findFiles('**/*.md', '').then(uriList => {
-      Promise.all<vscode.TextDocument>(uriList.map(uri => {
+      return Promise.all<vscode.TextDocument>(uriList.map(uri => {
         return vscode.workspace.openTextDocument(uri);
       })).then(documentList => {
+        let result = new Array<vscode.Location>();
         documentList.forEach(document => {
-          var postions = LinkCommand.check(document);
-          LinkCommand.linkLocationList = LinkCommand.linkLocationList.concat(postions);
+          let postions = LinkCommand.check(document);
+          result = result.concat(postions);
         })
+        return result;
       })
     })
   }
 
   static check(document: vscode.TextDocument): Array<vscode.Location> {
     const text = document.getText();
-    var positionList = Markdown.getLinkPositionList(text);
+    let positionList = MarkdownHelper.getLinkPositionList(path.dirname(document.uri.fsPath), text);
     positionList = positionList.filter((position: any): boolean => {
-      var filePath = path.normalize(path.join(document.uri.fsPath, position.url));
-      return !fs.existsSync(filePath);
+      return !position.isValid;
     })
 
-    let res = new Array<vscode.Location>();
+    let result = new Array<vscode.Location>();
     positionList.forEach(position => {
-      res.push(new vscode.Location(
+      result.push(new vscode.Location(
         document.uri,
         new vscode.Range(
-          new vscode.Position(position.rowNum, position.columnNumStart), 
-          new vscode.Position(position.rowNum, position.columnNumEnd))
+          new vscode.Position(position.rowNum, position.colStart), 
+          new vscode.Position(position.rowNum, position.colEnd))
       ))
     })
-    return res;
+    return result;
   }
 }

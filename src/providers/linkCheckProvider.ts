@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import LinkCheckDocument from '../schemes/linkCheckDocument';
-import LinkCheckCommand from '../commands/linkCommand';
+import LinkCommand from '../commands/linkCommand';
 
 export default class LinkCheckProvider implements vscode.TextDocumentContentProvider, vscode.DocumentLinkProvider {
 
@@ -42,7 +42,6 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
      * and (2) formatting the results
      */
     provideTextDocumentContent(uri: vscode.Uri): string | Thenable<string> {
-
         // already loaded?
         let document = this._documents.get(uri.toString());
         if (document) {
@@ -53,7 +52,7 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         // `reference provider` command (http://code.visualstudio.com/docs/extensionAPI/vscode-api-commands).
         // From the result create a references document which is in charge of loading,
         // printing, and formatting references
-        let locations = LinkCheckCommand.linkLocationList.slice();
+        let locations = LinkCommand.getResult(uri.toString()).slice();
 
         // sort by locations and shuffle to begin from target resource
         let idx = 0;

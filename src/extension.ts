@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import LinkCommand from './commands/linkCommand';
 import LinkCheckProvider from './providers/linkCheckProvider';
+import PathIntellisense from './providers/pathIntellisense';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -13,8 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
     const commandRegistration = vscode.commands.registerCommand('extension.checkLinks', () => {
         vscode.window.showInformationMessage('Check Links Start...');
 
-        return LinkCommand.checkAll().then(() => {
-            const uri = vscode.Uri.parse(`${LinkCheckProvider.scheme}:Links.locations`);
+        return LinkCommand.checkAll().then((locations) => {
+            var resultKey = LinkCommand.putResult(locations);
+            const uri = vscode.Uri.parse(`${LinkCheckProvider.scheme}:${resultKey}`);
             return vscode.workspace.openTextDocument(uri).then(doc => {
                 vscode.window.showTextDocument(doc, vscode.window.activeTextEditor.viewColumn + 1);
                 vscode.window.showInformationMessage('Check Links End!');
@@ -29,6 +31,9 @@ export function activate(context: vscode.ExtensionContext) {
         providerRegistrations,
         commandRegistration
     );
+
+    const provider = new PathIntellisense();
+    context.subscriptions.push(vscode.languages.registerCompletionItemProvider('markdown', provider, '(', '/', '\\'));
 }
 
 function validateWhenEdit(context: vscode.ExtensionContext) {
