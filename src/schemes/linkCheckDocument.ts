@@ -19,7 +19,7 @@ export default class LinkCheckDocument {
         this._emitter = emitter;
 
         // Start with printing a header and start resolving
-        this._lines = [`Found ${this._locations.length} references`];
+        this._lines = [`Found ${this._locations.length} links`];
         this._links = [];
         this._join = this._populate();
     }

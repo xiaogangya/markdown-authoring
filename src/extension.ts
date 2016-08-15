@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import LinkCommand from './commands/linkCommand';
-import LinkCheckProvider from './providers/linkCheckProvider';
+import LinkCheckProvider, {encodeLocation} from './providers/linkCheckProvider';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -12,7 +12,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     const commandRegistration = vscode.commands.registerCommand('extension.checkLinks', () => {
         vscode.window.showInformationMessage('Check Links!');
-        LinkCommand.check();
+        // LinkCommand.check();
+
+        const editor = vscode.window.activeTextEditor;
+        const uri = encodeLocation(editor.document.uri, editor.selection.active);
+        return vscode.workspace.openTextDocument(uri).then(doc => vscode.window.showTextDocument(doc, editor.viewColumn + 1));
     });
 
     context.subscriptions.push(

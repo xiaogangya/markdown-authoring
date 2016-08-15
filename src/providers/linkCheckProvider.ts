@@ -7,7 +7,7 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
 
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private _documents = new Map<string, LinkCheckDocument>();
-    private _editorDecoration = vscode.window.createTextEditorDecorationType({ textDecoration: 'underline' });
+    private _editorDecoration = vscode.window.createTextEditorDecorationType({ backgroundColor: 'rgba(206, 186, 44, 0.58)', textDecoration: 'underline' });
     private _subscriptions: vscode.Disposable;
 
     constructor() {
@@ -50,18 +50,23 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         // From the result create a references document which is in charge of loading,
         // printing, and formatting references
         const [target, pos] = decodeLocation(uri);
-        return vscode.commands.executeCommand<vscode.Location[]>('vscode.executeReferenceProvider', target, pos).then(locations => {
+        let locations = LinkCheckProvider.getLocationList(target);
 
-            // sort by locations and shuffle to begin from target resource
-            let idx = 0;
-            locations.sort(LinkCheckProvider._compareLocations).find((loc, i) => loc.uri.toString() === target.toString() && (idx = i) && true);
-            locations.push(...locations.splice(0, idx));
+        // sort by locations and shuffle to begin from target resource
+        let idx = 0;
+        locations.sort(LinkCheckProvider._compareLocations);
 
-            // create document and return its early state
-            let document = new LinkCheckDocument(uri, locations, this._onDidChange);
-            this._documents.set(uri.toString(), document);
-            return document.value;
-        });
+        // create document and return its early state
+        document = new LinkCheckDocument(uri, locations, this._onDidChange);
+        this._documents.set(uri.toString(), document);
+        return document.value;
+    }
+
+    private static getLocationList(uri: vscode.Uri) : vscode.Location[] {
+        let res = new Array<vscode.Location>();
+        res.push(new vscode.Location(uri, new vscode.Range(new vscode.Position(0, 8), new vscode.Position(0, 10))));
+        res.push(new vscode.Location(uri, new vscode.Range(new vscode.Position(4, 3), new vscode.Position(4, 5))));
+        return res;
     }
 
     private static _compareLocations(a: vscode.Location, b: vscode.Location): number {
@@ -89,7 +94,7 @@ let seq = 0;
 
 export function encodeLocation(uri: vscode.Uri, pos: vscode.Position): vscode.Uri {
     const query = JSON.stringify([uri.toString(), pos.line, pos.character]);
-    return vscode.Uri.parse(`${LinkCheckProvider.scheme}:References.locations?${query}#${seq++}`);
+    return vscode.Uri.parse(`${LinkCheckProvider.scheme}:Links.locations?${query}#${seq++}`);
 }
 
 export function decodeLocation(uri: vscode.Uri): [vscode.Uri, vscode.Position] {
