@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import Markdown from '../utilities/markdown'
 
@@ -14,6 +16,10 @@ export default class LinkCommand {
         documentList.forEach(document => {
           const text = document.getText();
           var positionList = Markdown.getLinkPositionList(text);
+          positionList = positionList.filter((position: any): boolean => {
+            var filePath = path.normalize(path.join(document.uri.fsPath, position.url));
+            return !fs.existsSync(filePath);
+          })
 
           positionList.forEach(position => {
             LinkCommand.linkLocationList.push(new vscode.Location(
