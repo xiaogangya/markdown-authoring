@@ -22,8 +22,9 @@ export function activate(context: vscode.ExtensionContext) {
             return vscode.workspace.openTextDocument(uri).then(doc => {
                 let activeEditor = vscode.window.activeTextEditor;
                 vscode.window.showTextDocument(doc, activeEditor ? activeEditor.viewColumn + 1 : 1, false).then(editor => {
-                    linkCheckProvider.decorate(editor, doc);
-                    vscode.window.setStatusBarMessage('Check Links End!', 5000);
+                    return linkCheckProvider.decorate(editor, doc).then(() => {
+                        vscode.window.setStatusBarMessage('Check Links End!', 5000);
+                    })
                 });
             });
         });
