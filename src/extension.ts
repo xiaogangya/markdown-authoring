@@ -17,10 +17,10 @@ export function activate(context: vscode.ExtensionContext) {
         vscode.window.showInformationMessage('Check Links Start...');
 
         return LinkCommand.checkAll().then((locations) => {
-            var resultKey = LinkCommand.putResult(locations);
-            const uri = vscode.Uri.parse(`${LinkCheckProvider.scheme}:${resultKey}`);
+            let resultKey = LinkCommand.putResult(locations);
+            const uri = LinkCheckProvider.encodeUri(resultKey);
             return vscode.workspace.openTextDocument(uri).then(doc => {
-                vscode.window.showTextDocument(doc, vscode.window.activeTextEditor.viewColumn + 1);
+                vscode.window.showTextDocument(doc, vscode.ViewColumn.Two);
                 vscode.window.showInformationMessage('Check Links End!');
             });
         });

@@ -6,20 +6,20 @@ import MarkdownUtils from '../utilities/markdownUtils'
 let uuid = require('node-uuid')
 
 export default class LinkCommand {
-    static results: Map<String, Array<vscode.Location>> = new Map<String, Array<vscode.Location>>()
+    static results: Map<String, Array<vscode.Location>> = new Map<String, Array<vscode.Location>>();
 
     static putResult(result: Array<vscode.Location>): string {
         let key: string = uuid.v4()
-        LinkCommand.results["linkCheck:" + key] = result;
-        return key
+        LinkCommand.results[key] = result;
+        return key;
     }
 
     static getResult(key: string): Array<vscode.Location> {
-        return LinkCommand.results[key]
+        return LinkCommand.results[key];
     }
 
     static deleteResult(key: string) {
-        LinkCommand.results.delete(key)
+        LinkCommand.results.delete(key);
     }
 
     static checkAll(): Thenable<Array<vscode.Location>> {

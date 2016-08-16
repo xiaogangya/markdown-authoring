@@ -37,7 +37,8 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
             return document.value;
         }
 
-        let locations = LinkCommand.getResult(uri.toString()).slice();
+        const resultKey = LinkCheckProvider.decodeUri(uri);
+        let locations = LinkCommand.getResult(resultKey).slice();
         locations.sort(LinkCheckProvider._compareLocations);
 
         // create document and return its early state
@@ -61,5 +62,14 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         if (doc) {
             return doc.links;
         }
+    }
+
+    static encodeUri(resultKey: string): vscode.Uri {
+        return vscode.Uri.parse(`${LinkCheckProvider.scheme}:LinkCheck.locations?${resultKey}`);
+    }
+
+    static decodeUri(uri: vscode.Uri): string {
+        let resultKey = uri.query;
+        return resultKey;
     }
 }
