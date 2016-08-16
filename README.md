@@ -1,65 +1,28 @@
-# markdown-authoring README
+# markdown authoring
 
-This is the README for your extension "markdown-authoring". After writing up a brief description, we recommend including the following sections.
+## Install
+Pre-install [vscode][vscode-download-link], search extensions by "[markdown-authoring][extension-download-link]", install and enable it.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Relative reference link check
+* Linting - ctrl+shift+p, run command "Markdown: Check Link", display invalid links of all markdown files in current workspace with highlight.
+* In-time check when edit - highlight invalid links when edit.
+* Intellegence when edit - show valid options when edit.
 
-For example if there is an image subfolder under your extension project workspace:
+## Demo
 
-\!\[feature X\]\(images/feature-x.png\)
+To do.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Follow-up
 
-## Requirements
+Other features to improve markdown authoring.
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## License
 
-## Extension Settings
+Copyright (c) 2011-2014, Yan Zhang. (MIT License)
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+See LICENSE for more info.
 
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+[vscode-download-link]: https://code.visualstudio.com/download
+[extension-download-link]: https://marketplace.visualstudio.com/items?itemName=yanz.markdown-authoring
