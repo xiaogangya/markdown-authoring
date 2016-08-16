@@ -8,16 +8,14 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
 
     private _onDidChange = new vscode.EventEmitter<vscode.Uri>();
     private _documents = new Map<string, LinkCheckDocument>();
-    private _editorDecoration = vscode.window.createTextEditorDecorationType({ backgroundColor: 'rgba(206, 186, 44, 0.58)', textDecoration: 'underline' });
+    private _editorDecoration = vscode.window.createTextEditorDecorationType({
+        backgroundColor: 'rgba(206, 186, 44, 0.58)', textDecoration: 'underline'
+    });
     private _subscriptions = new Array<vscode.Disposable>();
 
     constructor() {
-
-        // Listen to the following events:
-        // * closeTextDocument - which means we must clear the corresponding model object - `ReferencesDocument`
         this._subscriptions.push(
             vscode.workspace.onDidCloseTextDocument(doc => this._documents.delete(doc.uri.toString()))
-            // todo: listen link check command event
         )
     }
 
@@ -28,34 +26,18 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         this._onDidChange.dispose();
     }
 
-    /**
-     * Expose an event to signal changes of _virtual_ documents
-     * to the editor
-     */
     get onDidChange() {
         return this._onDidChange.event;
     }
 
-    /**
-     * Provider method that takes an uri of the `references`-scheme and
-     * resolves its content by (1) running the reference search command
-     * and (2) formatting the results
-     */
     provideTextDocumentContent(uri: vscode.Uri): string | Thenable<string> {
-        // already loaded?
+        // already loaded
         let document = this._documents.get(uri.toString());
         if (document) {
             return document.value;
         }
 
-        // Decode target-uri and target-position from the provided uri and execute the
-        // `reference provider` command (http://code.visualstudio.com/docs/extensionAPI/vscode-api-commands).
-        // From the result create a references document which is in charge of loading,
-        // printing, and formatting references
         let locations = LinkCommand.getResult(uri.toString()).slice();
-
-        // sort by locations and shuffle to begin from target resource
-        let idx = 0;
         locations.sort(LinkCheckProvider._compareLocations);
 
         // create document and return its early state
@@ -75,9 +57,6 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
     }
 
     provideDocumentLinks(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.DocumentLink[] {
-        // While building the virtual document we have already created the links.
-        // Those are composed from the range inside the document and a target uri
-        // to which they point
         const doc = this._documents.get(document.uri.toString());
         if (doc) {
             return doc.links;

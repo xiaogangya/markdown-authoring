@@ -5,7 +5,7 @@ import * as vscode from 'vscode';
 export class FileInfo {
     file: string;
     isFile: boolean;
-    
+
     constructor(dir: string, file: string) {
         this.file = file;
         this.isFile = fs.statSync(path.join(dir, file)).isFile();
@@ -13,8 +13,8 @@ export class FileInfo {
 }
 
 export function fileExists(dir, file) {
-  var fullpath = path.join(dir, file)
-  return fs.existsSync(fullpath) && fs.statSync(fullpath).isFile();
+    var fullpath = path.join(dir, file)
+    return fs.existsSync(fullpath) && fs.statSync(fullpath).isFile();
 }
 
 export function getChildren(startPath: string, maxResults?: number) {
@@ -24,16 +24,16 @@ export function getChildren(startPath: string, maxResults?: number) {
 }
 
 export function getChildFiles(include: string, maxResults?: number) {
-  return vscode.workspace.findFiles(include, '', maxResults)
+    return vscode.workspace.findFiles(include, '', maxResults)
 }
 
-export function getPath(fileName: string, text: string) : string {
-  var filedir = path.dirname(fileName);
-  if (text.startsWith("/") || text.startsWith("\\")) {
-      text = '.' + text;
-  }
-  var textdir = path.dirname(text);
-  return path.resolve(filedir, textdir);
+export function getPath(fileName: string, text: string): string {
+    var filedir = path.dirname(fileName);
+    if (text.startsWith("/") || text.startsWith("\\")) {
+        text = '.' + text;
+    }
+    var textdir = path.dirname(text);
+    return path.resolve(filedir, textdir);
 }
 
 export function getExt(document: vscode.TextDocument) {
@@ -47,7 +47,7 @@ export function getExt(document: vscode.TextDocument) {
 function readdir(path: string) {
     return new Promise<string[]>((resolve, reject) => {
         fs.readdir(path, (error, files) => {
-            if(error){
+            if (error) {
                 reject(error);
             } else {
                 resolve(files);

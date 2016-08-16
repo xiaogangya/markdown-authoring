@@ -82,7 +82,6 @@ export default class LinkCheckDocument {
     }
 
     private _fetchAndFormatLocations(uri: vscode.Uri, ranges: vscode.Range[]): PromiseLike<void> {
-
         // Fetch the document denoted by the uri and format the matches
         // with leading and trailing content form the document. Make sure
         // to not duplicate lines
@@ -110,7 +109,7 @@ export default class LinkCheckDocument {
         }
     }
 
-    private _appendMatch(doc: vscode.TextDocument, line:number, match: vscode.Range, target: vscode.Uri) {
+    private _appendMatch(doc: vscode.TextDocument, line: number, match: vscode.Range, target: vscode.Uri) {
         const text = doc.lineAt(line).text;
         const preamble = `  ${line + 1}: `;
 

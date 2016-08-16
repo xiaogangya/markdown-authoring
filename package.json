@@ -1,61 +1,61 @@
 {
-  "name": "markdown-authoring",
-  "displayName": "markdown-authoring",
-  "description": "A VS Code Extension of Markdown Authoring.",
-  "version": "0.0.1",
-  "publisher": "yanz",
-  "engines": {
-    "vscode": "^1.4.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "main": "./out/extension",
-  "contributes": {
-    "commands": [
-      {
-        "command": "extension.checkLinks",
-        "title": "Markdown: Check Links"
-      }
+    "name": "markdown-authoring",
+    "displayName": "markdown-authoring",
+    "description": "A VS Code Extension of Markdown Authoring.",
+    "version": "0.0.1",
+    "publisher": "yanz",
+    "engines": {
+        "vscode": "^1.4.0"
+    },
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "command": "extension.checkLinks",
-        "key": "alt+l",
-        "mac": "cmd+l"
-      }
+    "activationEvents": [
+        "*"
     ],
-    "languages": [
-      {
-        "id": "locations",
-        "aliases": [
-          "Locations"
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.checkLinks",
+                "title": "Markdown: Check Links"
+            }
         ],
-        "extensions": [
-          ".locations"
+        "keybindings": [
+            {
+                "command": "extension.checkLinks",
+                "key": "alt+l",
+                "mac": "cmd+l"
+            }
+        ],
+        "languages": [
+            {
+                "id": "locations",
+                "aliases": [
+                    "Locations"
+                ],
+                "extensions": [
+                    ".locations"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "locations",
+                "path": "./src/languages/locations.json",
+                "scopeName": "source.locations"
+            }
         ]
-      }
-    ],
-    "grammars": [
-      {
-        "language": "locations",
-        "path": "./src/languages/locations.json",
-        "scopeName": "source.locations"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
-    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
-    "postinstall": "node ./node_modules/vscode/bin/install"
-  },
-  "devDependencies": {
-    "tslint": "^3.8.1",
-    "typescript": "^1.8.5",
-    "vscode": "^0.11.0",
-    "node-uuid": "^1.4.7"
-  }
+    },
+    "scripts": {
+        "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
+        "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "tslint": "^3.8.1",
+        "typescript": "^1.8.5",
+        "vscode": "^0.11.0",
+        "node-uuid": "^1.4.7"
+    }
 }
