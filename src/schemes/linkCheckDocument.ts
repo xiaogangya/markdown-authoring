@@ -19,7 +19,10 @@ export default class LinkCheckDocument {
         this._emitter = emitter;
 
         // Start with printing a header and start resolving
-        this._lines = [`Found ${this._locations.length} links`];
+        let summary = this._locations.length > 1 ?
+            `Found ${this._locations.length} invalid links` :
+            `Found ${this._locations.length} invalid link`;
+        this._lines = [summary];
         this._links = [];
         this._join = this._populate();
     }

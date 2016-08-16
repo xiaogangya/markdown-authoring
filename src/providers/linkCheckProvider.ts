@@ -64,6 +64,16 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         }
     }
 
+    decorate(editor: vscode.TextEditor, document: vscode.TextDocument): void {
+        if (editor && document) {
+            const doc = this._documents.get(document.uri.toString());
+            if (doc) {
+                const rangeList = doc.links.map(link => link.range);
+                editor.setDecorations(this._editorDecoration, rangeList);
+            }
+        }
+    }
+
     static encodeUri(resultKey: string): vscode.Uri {
         return vscode.Uri.parse(`${LinkCheckProvider.scheme}:LinkCheck.locations?${resultKey}`);
     }

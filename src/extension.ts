@@ -20,8 +20,10 @@ export function activate(context: vscode.ExtensionContext) {
             let resultKey = LinkCommand.putResult(locations);
             const uri = LinkCheckProvider.encodeUri(resultKey);
             return vscode.workspace.openTextDocument(uri).then(doc => {
-                vscode.window.showTextDocument(doc, vscode.ViewColumn.Two);
-                vscode.window.setStatusBarMessage('Check Links End!', 5000);
+                vscode.window.showTextDocument(doc, vscode.ViewColumn.Two).then(editor => {
+                    linkCheckProvider.decorate(editor, doc);
+                    vscode.window.setStatusBarMessage('Check Links End!', 5000);
+                });
             });
         });
     });
@@ -72,7 +74,7 @@ function validateWhenEdit(context: vscode.ExtensionContext) {
             var decorations: vscode.DecorationOptions[] = [];
             let locations = LinkCommand.check(activeEditor.document);
             locations.forEach(location => {
-                var decoration = { range: location.range, hoverMessage: '** bad link **' };
+                var decoration = { range: location.range, hoverMessage: '** invalid link **' };
                 decorations.push(decoration);
             })
             activeEditor.setDecorations(decorationType, decorations);
