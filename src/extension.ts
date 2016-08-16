@@ -14,14 +14,14 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     const commandRegistration = vscode.commands.registerCommand('extension.checkLinks', () => {
-        vscode.window.showInformationMessage('Check Links Start...');
+        vscode.window.setStatusBarMessage('Check Links Start...', 5000);
 
         return LinkCommand.checkAll().then((locations) => {
             let resultKey = LinkCommand.putResult(locations);
             const uri = LinkCheckProvider.encodeUri(resultKey);
             return vscode.workspace.openTextDocument(uri).then(doc => {
                 vscode.window.showTextDocument(doc, vscode.ViewColumn.Two);
-                vscode.window.showInformationMessage('Check Links End!');
+                vscode.window.setStatusBarMessage('Check Links End!', 5000);
             });
         });
     });
