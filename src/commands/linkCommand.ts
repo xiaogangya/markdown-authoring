@@ -1,35 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import MarkdownUtils from '../utilities/markdownUtils'
-
-let uuid = require('node-uuid')
+import MarkdownUtils from '../utilities/markdownUtils';
 
 export default class LinkCommand {
-    static results: Map<String, Array<vscode.Location>> = new Map<String, Array<vscode.Location>>();
-
-    static putResult(result: Array<vscode.Location>): string {
-        let key: string = uuid.v4()
-        LinkCommand.results[key] = result;
-        return key;
-    }
-
-    static getResult(key: string): Array<vscode.Location> {
-        return LinkCommand.results[key];
-    }
-
-    static deleteResult(key: string) {
-        LinkCommand.results.delete(key);
-    }
-
     static checkAll(): Thenable<Array<vscode.Location>> {
         return vscode.workspace.findFiles('**/*.md', '').then(uriList => {
-            return Promise.all<vscode.TextDocument>(uriList.map(uri => {
-                return vscode.workspace.openTextDocument(uri);
-            })).then(documentList => {
+            return Promise.all<any>(uriList.map(uri => {
+                try {
+                    return {
+                        text: fs.readFileSync(uri.fsPath, "UTF-8"),
+                        path: uri.fsPath
+                    };
+                } catch(e) {
+                    return null;
+                }
+            })).then(fileList => {
                 let result = new Array<vscode.Location>();
-                documentList.forEach(document => {
-                    let postions = LinkCommand.check(document);
+                fileList.filter(d => d != null).forEach(file => {
+                    let postions = LinkCommand.check(file.text, file.path);
                     result = result.concat(postions);
                 })
                 return result;
@@ -37,9 +26,8 @@ export default class LinkCommand {
         })
     }
 
-    static check(document: vscode.TextDocument): Array<vscode.Location> {
-        const text = document.getText();
-        let positionList = MarkdownUtils.getLinkPositionList(path.dirname(document.uri.fsPath), text);
+    static check(text: string, filepath: string): Array<vscode.Location> {
+        let positionList = MarkdownUtils.getLinkPositionList(path.dirname(filepath), text);
         positionList = positionList.filter((position: any): boolean => {
             return !position.isValid;
         })
@@ -47,7 +35,7 @@ export default class LinkCommand {
         let result = new Array<vscode.Location>();
         positionList.forEach(position => {
             result.push(new vscode.Location(
-                document.uri,
+                vscode.Uri.file(filepath),
                 new vscode.Range(
                     new vscode.Position(position.rowNum, position.colStart),
                     new vscode.Position(position.rowNum, position.colEnd))

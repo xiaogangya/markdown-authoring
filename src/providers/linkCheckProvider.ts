@@ -2,6 +2,8 @@ import * as vscode from 'vscode';
 import LinkCheckDocument from '../schemes/linkCheckDocument';
 import LinkCommand from '../commands/linkCommand';
 
+let uuid = require('node-uuid')
+
 export default class LinkCheckProvider implements vscode.TextDocumentContentProvider, vscode.DocumentLinkProvider {
 
     static scheme = 'linkCheck';
@@ -12,6 +14,20 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         backgroundColor: 'rgba(206, 186, 44, 0.58)', textDecoration: 'underline'
     });
     private _subscriptions = new Array<vscode.Disposable>();
+
+    private static _results: Map<String, Array<vscode.Location>> = new Map<String, Array<vscode.Location>>();
+
+    static putResult(result: Array<vscode.Location>): string {
+        let key: string = uuid.v4()
+        this._results[key] = result;
+        return key;
+    }
+
+    static getResult(key: string): Array<vscode.Location> {
+        let result = this._results[key];
+        this._results.delete(key);
+        return result;
+    }
 
     constructor() {
         this._subscriptions.push(
@@ -38,7 +54,7 @@ export default class LinkCheckProvider implements vscode.TextDocumentContentProv
         }
 
         const resultKey = LinkCheckProvider.decodeUri(uri);
-        let locations = LinkCommand.getResult(resultKey).slice();
+        let locations = LinkCheckProvider.getResult(resultKey).slice();
         locations.sort(LinkCheckProvider._compareLocations);
 
         // create document and return its early state

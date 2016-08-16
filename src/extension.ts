@@ -10,17 +10,18 @@ export function activate(context: vscode.ExtensionContext) {
     const providerRegistrations = vscode.Disposable.from(
         vscode.workspace.registerTextDocumentContentProvider(LinkCheckProvider.scheme, linkCheckProvider),
         vscode.languages.registerDocumentLinkProvider({ scheme: LinkCheckProvider.scheme }, linkCheckProvider),
-        vscode.languages.registerCompletionItemProvider('markdown', pathCompletionProvider, '(', '/', '\\')
+        vscode.languages.registerCompletionItemProvider('markdown', pathCompletionProvider, '(', '/', '\\', '.')
     );
 
     const commandRegistration = vscode.commands.registerCommand('extension.checkLinks', () => {
         vscode.window.setStatusBarMessage('Check Links Start...', 5000);
 
         return LinkCommand.checkAll().then((locations) => {
-            let resultKey = LinkCommand.putResult(locations);
+            let resultKey = LinkCheckProvider.putResult(locations);
             const uri = LinkCheckProvider.encodeUri(resultKey);
             return vscode.workspace.openTextDocument(uri).then(doc => {
-                vscode.window.showTextDocument(doc, vscode.ViewColumn.Two).then(editor => {
+                let activeEditor = vscode.window.activeTextEditor;
+                vscode.window.showTextDocument(doc, activeEditor ? activeEditor.viewColumn + 1 : 1, false).then(editor => {
                     linkCheckProvider.decorate(editor, doc);
                     vscode.window.setStatusBarMessage('Check Links End!', 5000);
                 });
@@ -72,7 +73,7 @@ function validateWhenEdit(context: vscode.ExtensionContext) {
     function validate() {
         if (activeEditor && activeEditor.document.languageId == 'markdown') {
             var decorations: vscode.DecorationOptions[] = [];
-            let locations = LinkCommand.check(activeEditor.document);
+            let locations = LinkCommand.check(activeEditor.document.getText(), activeEditor.document.fileName);
             locations.forEach(location => {
                 var decoration = { range: location.range, hoverMessage: '** invalid link **' };
                 decorations.push(decoration);

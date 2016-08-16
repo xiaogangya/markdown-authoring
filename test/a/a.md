@@ -5,3 +5,6 @@ See my [test](/test.md) page for details.
 
 This is [an example][b] reference-style link.
 [b]: ../b/b.md
+[c]: /test/b/b.md
+[invalid]: /asdkd/sdfdf.md
+
