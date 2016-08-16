@@ -4,7 +4,4 @@ This is [an example](http://example.com/ "Title") inline link.
 See my [test](/test.md) page for details.
 
 This is [an example][b] reference-style link.
-[a][]
-[a]: a/a.md
-[b]: ./b/b.md
-[c]: ../c.md
+[b]: ../b/b.md

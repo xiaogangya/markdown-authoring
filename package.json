@@ -3,6 +3,10 @@
     "displayName": "markdown-authoring",
     "description": "A VS Code Extension of Markdown Authoring.",
     "version": "0.1.1",
+    "keywords": [
+        "markdown",
+        "authoring"
+    ],
     "publisher": "yanz",
     "engines": {
         "vscode": "^1.4.0"

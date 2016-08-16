@@ -1,12 +1,12 @@
-# markdown authoring
+# markdown-authoring
 
 ## Install
-Pre-install [vscode][vscode-download-link], search extensions by "[markdown-authoring][extension-download-link]", install and enable it.
+Launch [vscode][vscode-download-link], quick open(ctrl+p), run "ext install markdown-authoring". Please note to enable it.
 
 ## Features
 
 ### Relative reference link check
-* Linting - ctrl+shift+p, run command "Markdown: Check Link", display invalid links of all markdown files in current workspace with highlight.
+* Linting - ctrl+shift+p to run command "Markdown: Check Link", or alt+l, display invalid links of all markdown files in current workspace with highlight.
 * In-time check when edit - highlight invalid links when edit.
 * Intellegence when edit - show valid options when edit.
 
@@ -18,11 +18,16 @@ To do.
 
 Other features to improve markdown authoring.
 
+## About
+
+* [markdown-authoring extension in vs marketplace][markdown-authoring-download-link]
+
 ## License
 
-Copyright (c) 2011-2014, Yan Zhang. (MIT License)
-
-See LICENSE for more info.
+[MIT](LICENSE.txt)
 
 [vscode-download-link]: https://code.visualstudio.com/download
-[extension-download-link]: https://marketplace.visualstudio.com/items?itemName=yanz.markdown-authoring
+[vscode-extension-development-link]: https://code.visualstudio.com/docs/extensions/overview
+[markdown-syntax-link]: https://daringfireball.net/projects/markdown/syntax
+[markdown-authoring-download-link]: https://marketplace.visualstudio.com/items?itemName=yanz.markdown-authoring
+
