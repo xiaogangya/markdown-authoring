@@ -5,10 +5,10 @@ Launch [vscode][vscode-download-link], quick open(ctrl+p), run "ext install mark
 
 ## Features
 
-### Relative reference link check
-* Linting - ctrl+shift+p to run command "Markdown: Check Link", or alt+l, display invalid links of all markdown files in current workspace with highlight.
-* In-time check when edit - highlight invalid links when edit.
-* Intellegence when edit - show valid options when edit.
+### Relative reference link validation
+
+* Linting - auto-diagnostic opened documents and show invalid relative reference links as compile warnings.
+* Intellegence - auto-detect and provide suggestions with valid relative reference link options when edit.
 
 ## Demo
 
