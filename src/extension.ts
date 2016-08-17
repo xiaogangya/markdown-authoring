@@ -40,7 +40,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(providerRegistrations);
 }
 
-function lint(uri: vscode.Uri, document: vscode.TextDocument): void {
+function lint(uri: vscode.Uri, document?: vscode.TextDocument): void {
     if (path.extname(uri.fsPath) !== '.md') {
         return;
     }
@@ -48,7 +48,6 @@ function lint(uri: vscode.Uri, document: vscode.TextDocument): void {
     const invalidLinks = check(uri, document);
     let diagnostics = [];
     invalidLinks.forEach(link => {
-        console.log('alalalala!!!');
         let diangostic = new vscode.Diagnostic(
             link.location.range,
             'Invalid relative reference link',
@@ -84,20 +83,24 @@ function requestLint(uri: vscode.Uri, document?: vscode.TextDocument): void {
 }
 
 function checkAll(): void {
-    diagnosticCollection.clear();
+    vscode.window.setStatusBarMessage('start check links for all markdown files...',
+        vscode.workspace.findFiles('**/*.md', '').then(uriList => {
+            diagnosticCollection.clear();
 
-    var openedDocuments = vscode.workspace.textDocuments;
-    var openedUris = openedDocuments.map(x => x.uri);
-    vscode.workspace.findFiles('**/*.md', '').then(uriList => {
-        uriList.map(uri => {
-            let index = openedUris.findIndex(x => x.fsPath === uri.fsPath);
-            if (index >= 0) {
-                requestLint(uri, openedDocuments[index]);
-            } else {
-                requestLint(uri);
-            }
-        });
-    })
+            var openedDocuments = vscode.workspace.textDocuments;
+            var openedUris = openedDocuments.map(x => x.uri);
+
+            uriList.map(uri => {
+                let index = openedUris.findIndex(x => x.fsPath === uri.fsPath);
+                if (index >= 0) {
+                    lint(uri, openedDocuments[index]);
+                } else {
+                    lint(uri);
+                }
+            });
+        }).then(() => {
+            vscode.window.setStatusBarMessage('end check links for all markdown files!', 5000);
+        }));
 }
 
 function check(uri: vscode.Uri, document?: vscode.TextDocument): Array<any> {
