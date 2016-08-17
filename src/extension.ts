@@ -1,85 +1,99 @@
 import * as vscode from 'vscode';
-import LinkCommand from './commands/linkCommand';
-import LinkCheckProvider from './providers/linkCheckProvider';
+import MarkdownUtils from './utilities/markdownUtils';
 import PathCompletionProvider from './providers/pathCompletionProvider';
+
+const markdownLanguageId = "markdown";
+const throttleDuration = 500;
+
+const diagnosticCollection = vscode.languages.createDiagnosticCollection('markdown-authoring');
+var throttle = {
+    "document": null,
+    "timeout": null
+};
+
 
 export function activate(context: vscode.ExtensionContext) {
 
-    const linkCheckProvider = new LinkCheckProvider();
+    // register workspace events
+    context.subscriptions.push(
+        vscode.workspace.onDidOpenTextDocument(lint),
+        vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
+        vscode.workspace.onDidCloseTextDocument(didCloseTextDocument)
+    );
+
+    // register diagnotic collection
+    context.subscriptions.push(diagnosticCollection);
+
+    // register path completion provider
     const pathCompletionProvider = new PathCompletionProvider();
     const providerRegistrations = vscode.Disposable.from(
-        vscode.workspace.registerTextDocumentContentProvider(LinkCheckProvider.scheme, linkCheckProvider),
-        vscode.languages.registerDocumentLinkProvider({ scheme: LinkCheckProvider.scheme }, linkCheckProvider),
         vscode.languages.registerCompletionItemProvider('markdown', pathCompletionProvider, '(', '/', '\\', '.')
     );
-
-    const commandRegistration = vscode.commands.registerCommand('extension.checkLinks', () => {
-        vscode.window.setStatusBarMessage('Check Links Start...', 5000);
-
-        return LinkCommand.checkAll().then((locations) => {
-            let resultKey = LinkCheckProvider.putResult(locations);
-            const uri = LinkCheckProvider.encodeUri(resultKey);
-            return vscode.workspace.openTextDocument(uri).then(doc => {
-                let activeEditor = vscode.window.activeTextEditor;
-                vscode.window.showTextDocument(doc, activeEditor ? activeEditor.viewColumn + 1 : 1, false).then(editor => {
-                    return linkCheckProvider.decorate(editor, doc).then(() => {
-                        vscode.window.setStatusBarMessage('Check Links End!', 5000);
-                    })
-                });
-            });
-        });
-    });
-
-    validateWhenEdit(context);
-
-    context.subscriptions.push(
-        linkCheckProvider,
-        providerRegistrations,
-        commandRegistration
-    );
+    context.subscriptions.push(providerRegistrations);
 }
 
-function validateWhenEdit(context: vscode.ExtensionContext) {
-    var decorationType = vscode.window.createTextEditorDecorationType({
-        cursor: 'crosshair',
-        backgroundColor: 'rgba(255,0,0,0.3)'
-    });
-
-    var activeEditor = vscode.window.activeTextEditor;
-    if (activeEditor) {
-        triggerValidation();
+function lint(document: vscode.TextDocument): void {
+    if (document.languageId !== markdownLanguageId) {
+        return;
     }
 
-    vscode.window.onDidChangeActiveTextEditor(editor => {
-        activeEditor = editor;
-        if (editor) {
-            triggerValidation();
-        }
-    }, null, context.subscriptions);
+    const invalidLinks = check(document);
+    let diagnostics = [];
+    invalidLinks.forEach(link => {
+        let diangostic = new vscode.Diagnostic(
+            link.range,
+            'invalid relative reference link',
+            vscode.DiagnosticSeverity.Warning
+        );
+        diangostic.source = document.lineAt(link.range.start.line).text
+            .substring(link.range.start.character, link.range.end.character);
+        diagnostics.push(diangostic);
+    })
 
-    vscode.workspace.onDidChangeTextDocument(event => {
-        if (activeEditor && event.document === activeEditor.document) {
-            triggerValidation();
-        }
-    }, null, context.subscriptions);
+    diagnosticCollection.set(document.uri, diagnostics);
+}
 
-    var timeout = null;
-    function triggerValidation() {
-        if (timeout) {
-            clearTimeout(timeout);
-        }
-        timeout = setTimeout(validate, 500);
+function didChangeTextDocument(change: any): void {
+    requestLint(change.document);
+}
+
+function didCloseTextDocument(document: vscode.TextDocument): void {
+    suppressLint(document);
+    diagnosticCollection.delete(document.uri);
+}
+
+function suppressLint(document: vscode.TextDocument): void {
+    if (throttle.timeout && (document === throttle.document)) {
+        clearTimeout(throttle.timeout);
+        throttle.document = null;
+        throttle.timeout = null;
     }
+}
 
-    function validate() {
-        if (activeEditor && activeEditor.document.languageId == 'markdown') {
-            var decorations: vscode.DecorationOptions[] = [];
-            let locations = LinkCommand.check(activeEditor.document.getText(), activeEditor.document.fileName);
-            locations.forEach(location => {
-                var decoration = { range: location.range, hoverMessage: '** invalid link **' };
-                decorations.push(decoration);
-            })
-            activeEditor.setDecorations(decorationType, decorations);
-        }
-    }
+function requestLint(document: vscode.TextDocument): void {
+    suppressLint(document);
+    throttle.document = document;
+    throttle.timeout = setTimeout(function waitThrottleDuration() {
+        // Do not use throttle.document in this function; it may have changed
+        lint(document);
+        suppressLint(document);
+    }, throttleDuration);
+}
+
+function check(document: vscode.TextDocument): Array<vscode.Location> {
+    let positionList = MarkdownUtils.getLinkPositionList(document.uri.fsPath, document.getText());
+    positionList = positionList.filter((position: any): boolean => {
+        return !position.isValid;
+    })
+
+    let result = new Array<vscode.Location>();
+    positionList.forEach(position => {
+        result.push(new vscode.Location(
+            vscode.Uri.file(document.uri.path),
+            new vscode.Range(
+                new vscode.Position(position.rowNum, position.colStart),
+                new vscode.Position(position.rowNum, position.colEnd))
+        ))
+    })
+    return result;
 }

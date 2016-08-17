@@ -5,51 +5,31 @@
     "version": "0.1.1",
     "keywords": [
         "markdown",
-        "authoring"
+        "authoring",
+        "lint",
+        "md"
     ],
+    "author": "Yan Zhang",
     "publisher": "yanz",
+    "license": "MIT",
     "engines": {
         "vscode": "^1.4.0"
     },
     "categories": [
+        "Linters",
         "Other"
     ],
+    "homepage": "https://marketplace.visualstudio.com/items?itemName=yanz.markdown-authoring",
+    "repository": {
+		"type": "git",
+		"url": "https://github.com/xiaogangya/markdown-authoring.git"
+	},
+	"bugs": "https://github.com/xiaogangya/markdown-authoring/issues",
     "activationEvents": [
-        "*"
+        "onLanguage:markdown"
     ],
     "main": "./out/extension",
     "contributes": {
-        "commands": [
-            {
-                "command": "extension.checkLinks",
-                "title": "Markdown: Check Links"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "extension.checkLinks",
-                "key": "alt+l",
-                "mac": "cmd+l"
-            }
-        ],
-        "languages": [
-            {
-                "id": "locations",
-                "aliases": [
-                    "Locations"
-                ],
-                "extensions": [
-                    ".locations"
-                ]
-            }
-        ],
-        "grammars": [
-            {
-                "language": "locations",
-                "path": "./src/languages/locations.json",
-                "scopeName": "source.locations"
-            }
-        ]
     },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
