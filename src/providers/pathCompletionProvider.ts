@@ -49,9 +49,7 @@ export default class PathCompletionProvider implements vscode.CompletionItemProv
     provideCompletionItems(document: vscode.TextDocument, position: vscode.Position): Thenable<vscode.CompletionItem[]> {
         const line = document.getText(document.lineAt(position).range);
         const partialLinkText = MarkdownUtils.getPartialLinkText(line, position.character);
-        console.log(partialLinkText)
         const startPath = MarkdownUtils.resolvePath(path.dirname(document.fileName), partialLinkText);
-        console.log(startPath)
 
         if (partialLinkText != null) {
             return this.getChildren(startPath).then(children => {

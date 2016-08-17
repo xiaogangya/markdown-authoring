@@ -16,7 +16,7 @@ class RegexRepl {
   }
 
   replace(name: string, val: RegExp): RegexRepl {
-    var valSrc = val.source;
+    let valSrc = val.source;
     valSrc = valSrc.replace(/(^|[^\[])\^/g, '$1');
     this.resultSrc = this.resultSrc.replace(name, valSrc);
     return this;
@@ -44,27 +44,27 @@ export default class MarkdownUtils {
   private static regex_def_partial: RegExp = /^ *\[[^\]]+\]: *<?([^\s>]+)$/;
 
   private static parseLink(rowNum: number, rowText: string): any[] {
-    let res = [];
-    res = res.concat(this.parseLinkInternal(rowNum, rowText, MarkdownUtils.regex_link));
-    res = res.concat(this.parseLinkInternal(rowNum, rowText, MarkdownUtils.regex_def));
+    let result = [];
+    result = result.concat(this.parseLinkInternal(rowNum, rowText, MarkdownUtils.regex_link));
+    result = result.concat(this.parseLinkInternal(rowNum, rowText, MarkdownUtils.regex_def));
 
-    return res;
+    return result;
   }
 
-  private static parseLinkInternal(rowNum: number, rowText: string, regex: RegExp): any[] {
-    let res = [];
+  private static parseLinkInternal(rowNum: number, rowText: string, regexp: RegExp): any[] {
+    let result = [];
 
-    var match;
-    var regex = new RegExp(regex.source, 'g');
-    while (match = regex.exec(rowText)) {
-      var url: string = match[1]
-      var isValid = true
-      var isFileLink = false
-      if (!url.includes("://")) {
-        // considered as a path
-        isFileLink = true
+    let match;
+    let reg = new RegExp(regexp.source, 'g');
+    while (match = reg.exec(rowText)) {
+      let url: string = match[1];
+      let isFileLink = MarkdownUtils.isFileLink(url);
+      if (isFileLink) {
+        url = MarkdownUtils.getFileLink(url);
       }
-      res.push({
+     
+      result.push({
+        source: match[1],
         url: url,
         rowNum: rowNum,
         colStart: match.index,
@@ -74,11 +74,34 @@ export default class MarkdownUtils {
       })
     }
 
-    return res;
+    return result;
+  }
+
+  private static isFileLink(url: string): boolean {
+    // etc. http:, mailto:
+    if (url.includes(':')) return false;
+    // etc. #asdf
+    if (url.startsWith('#')) return false;
+    // etc. /a/b
+    // remove trailing #
+    url = this.getFileLink(url);
+    // get file extension, if longer than 5 characters, ignore
+    // because the java package like com.microsoft.xxx may contain . as well.
+    if (path.extname(url).length == 0 || path.extname(url).length > 4) return false;
+
+    return true;
+  }
+
+  private static getFileLink(url: string): string {
+    let index = url.indexOf('#');
+    if (index > 0) {
+      url = url.substring(0, index);
+    }
+    return url;
   }
 
   private static fileExists(currentPath: string, file: string) {
-    var fullpath = path.resolve(MarkdownUtils.resolvePath(currentPath, file), path.basename(file));
+    const fullpath = path.resolve(MarkdownUtils.resolvePath(currentPath, file), path.basename(file));
     return fs.existsSync(fullpath) && fs.statSync(fullpath).isFile();
   }
 
@@ -102,8 +125,8 @@ export default class MarkdownUtils {
   public static getPartialLinkText(text: string, pos: number): string {
     let context = text.substring(0, pos)
 
-    var match;
-    var regex = new RegExp(MarkdownUtils.regex_link_partial.source, 'g');
+    let match;
+    let regex = new RegExp(MarkdownUtils.regex_link_partial.source, 'g');
     if (match = regex.exec(context)) {
       return match[1]
     }
@@ -115,12 +138,12 @@ export default class MarkdownUtils {
   }
 
   public static resolvePath(currentPath: string, linkText: string): string {
-    var rootPath = vscode.workspace.rootPath;
+    let rootPath = vscode.workspace.rootPath;
     if (!rootPath) {
       rootPath = currentPath;
     }
 
-    var textdir = linkText;
+    let textdir = linkText;
     if (!linkText.endsWith("/") && !linkText.endsWith("\\")) {
       textdir = path.dirname(linkText);
     }

@@ -1,7 +1,7 @@
 # markdown-authoring
 
 ## Install
-Launch [vscode][vscode-download-link], quick open(ctrl+p), run "ext install markdown-authoring". Please note to enable it.
+Launch [vscode][vscode-download-link], quick open(ctrl+p on windows, ⌘+p on mac), run "ext install markdown-authoring". Please note to enable it.
 
 ## Features
 

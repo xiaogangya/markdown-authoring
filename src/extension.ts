@@ -1,24 +1,32 @@
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import MarkdownUtils from './utilities/markdownUtils';
 import PathCompletionProvider from './providers/pathCompletionProvider';
 
-const markdownLanguageId = "markdown";
-const throttleDuration = 500;
-
 const diagnosticCollection = vscode.languages.createDiagnosticCollection('markdown-authoring');
+
+const throttleDuration = 500;
 var throttle = {
-    "document": null,
+    "uri": null,
     "timeout": null
 };
 
 
 export function activate(context: vscode.ExtensionContext) {
+    // check all at the beginning
+    checkAll();
+
+    // register commands
+    context.subscriptions.push(
+        vscode.commands.registerCommand('extension.linkCheck', () => {
+            checkAll();
+        })
+    )
 
     // register workspace events
     context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument(lint),
-        vscode.workspace.onDidChangeTextDocument(didChangeTextDocument),
-        vscode.workspace.onDidCloseTextDocument(didCloseTextDocument)
+        vscode.workspace.onDidChangeTextDocument(didChangeTextDocument)
     );
 
     // register diagnotic collection
@@ -32,68 +40,85 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(providerRegistrations);
 }
 
-function lint(document: vscode.TextDocument): void {
-    if (document.languageId !== markdownLanguageId) {
+function lint(uri: vscode.Uri, document: vscode.TextDocument): void {
+    if (path.extname(uri.fsPath) !== '.md') {
         return;
     }
 
-    const invalidLinks = check(document);
+    const invalidLinks = check(uri, document);
     let diagnostics = [];
     invalidLinks.forEach(link => {
+        console.log('alalalala!!!');
         let diangostic = new vscode.Diagnostic(
-            link.range,
-            'invalid relative reference link',
+            link.location.range,
+            'Invalid relative reference link',
             vscode.DiagnosticSeverity.Warning
         );
-        diangostic.source = document.lineAt(link.range.start.line).text
-            .substring(link.range.start.character, link.range.end.character);
+        diangostic.source = link.source;
         diagnostics.push(diangostic);
     })
 
-    diagnosticCollection.set(document.uri, diagnostics);
+    diagnosticCollection.set(uri, diagnostics);
 }
 
 function didChangeTextDocument(change: any): void {
-    requestLint(change.document);
+    requestLint(change.document.uri, change.document);
 }
 
-function didCloseTextDocument(document: vscode.TextDocument): void {
-    suppressLint(document);
-    diagnosticCollection.delete(document.uri);
-}
-
-function suppressLint(document: vscode.TextDocument): void {
-    if (throttle.timeout && (document === throttle.document)) {
+function suppressLint(uri: vscode.Uri): void {
+    if (throttle.timeout && (uri === throttle.uri)) {
         clearTimeout(throttle.timeout);
-        throttle.document = null;
+        throttle.uri = null;
         throttle.timeout = null;
     }
 }
 
-function requestLint(document: vscode.TextDocument): void {
-    suppressLint(document);
-    throttle.document = document;
+function requestLint(uri: vscode.Uri, document?: vscode.TextDocument): void {
+    suppressLint(uri);
+    throttle.uri = uri;
     throttle.timeout = setTimeout(function waitThrottleDuration() {
         // Do not use throttle.document in this function; it may have changed
-        lint(document);
-        suppressLint(document);
+        lint(uri, document);
+        suppressLint(uri);
     }, throttleDuration);
 }
 
-function check(document: vscode.TextDocument): Array<vscode.Location> {
-    let positionList = MarkdownUtils.getLinkPositionList(document.uri.fsPath, document.getText());
+function checkAll(): void {
+    diagnosticCollection.clear();
+
+    var openedDocuments = vscode.workspace.textDocuments;
+    var openedUris = openedDocuments.map(x => x.uri);
+    vscode.workspace.findFiles('**/*.md', '').then(uriList => {
+        uriList.map(uri => {
+            let index = openedUris.findIndex(x => x.fsPath === uri.fsPath);
+            if (index >= 0) {
+                requestLint(uri, openedDocuments[index]);
+            } else {
+                requestLint(uri);
+            }
+        });
+    })
+}
+
+function check(uri: vscode.Uri, document?: vscode.TextDocument): Array<any> {
+    let positionList = MarkdownUtils.getLinkPositionList(
+        path.dirname(uri.fsPath),
+        document ? document.getText() : fs.readFileSync(uri.fsPath).toString());
     positionList = positionList.filter((position: any): boolean => {
         return !position.isValid;
     })
 
-    let result = new Array<vscode.Location>();
+    let result = new Array<any>();
     positionList.forEach(position => {
-        result.push(new vscode.Location(
-            vscode.Uri.file(document.uri.path),
-            new vscode.Range(
-                new vscode.Position(position.rowNum, position.colStart),
-                new vscode.Position(position.rowNum, position.colEnd))
-        ))
+        result.push({
+            'location': new vscode.Location(
+                vscode.Uri.file(uri.fsPath),
+                new vscode.Range(
+                    new vscode.Position(position.rowNum, position.colStart),
+                    new vscode.Position(position.rowNum, position.colEnd))
+            ),
+            'source': position.source
+        })
     })
     return result;
 }

@@ -30,7 +30,21 @@
         "onLanguage:markdown"
     ],
     "main": "./out/extension",
-    "contributes": {},
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.linkCheck",
+                "title": "Markdown: Link Check"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "extension.linkCheck",
+                "key": "alt+l",
+                "mac": "cmd+l"
+            }
+        ]
+    },
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
         "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
