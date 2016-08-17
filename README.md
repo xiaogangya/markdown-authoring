@@ -7,12 +7,13 @@ Launch [vscode][vscode-download-link], quick open(ctrl+p on windows, ⌘+p on ma
 
 ### Relative reference link validation
 
-* Linting - auto-diagnostic opened documents and show invalid relative reference links as compile warnings.
+* Auto-diagnostic when load extension and command(alt+l) support - show invalid relative reference links as severity warnings for all markdown files in workspace. 
+* Auto-track when edit - also diagnostic for editing markdown files.
 * Intellegence - auto-detect and provide suggestions with valid relative reference link options when edit.
 
 ## Demo
 
-To do.
+![](demo.gif)
 
 ## Follow-up
 
