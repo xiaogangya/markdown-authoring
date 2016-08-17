@@ -2,7 +2,7 @@
     "name": "markdown-authoring",
     "displayName": "markdown-authoring",
     "description": "A VS Code Extension of Markdown Authoring.",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "keywords": [
         "markdown",
         "authoring",
@@ -21,16 +21,15 @@
     ],
     "homepage": "https://marketplace.visualstudio.com/items?itemName=yanz.markdown-authoring",
     "repository": {
-		"type": "git",
-		"url": "https://github.com/xiaogangya/markdown-authoring.git"
-	},
-	"bugs": "https://github.com/xiaogangya/markdown-authoring/issues",
+        "type": "git",
+        "url": "https://github.com/xiaogangya/markdown-authoring.git"
+    },
+    "bugs": "https://github.com/xiaogangya/markdown-authoring/issues",
     "activationEvents": [
         "onLanguage:markdown"
     ],
     "main": "./out/extension",
-    "contributes": {
-    },
+    "contributes": {},
     "scripts": {
         "vscode:prepublish": "node ./node_modules/vscode/bin/compile",
         "compile": "node ./node_modules/vscode/bin/compile -watch -p ./",
