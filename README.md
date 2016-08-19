@@ -13,7 +13,7 @@ Launch [vscode][vscode-download-link], quick open(ctrl+p on windows, ⌘+p on ma
 
 ## Demo
 
-![](demo.gif)
+![demo](images/demo.gif)
 
 ## Follow-up
 
