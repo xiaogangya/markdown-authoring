@@ -3,7 +3,7 @@
     "displayName": "markdown-authoring",
     "description": "A VS Code Extension of Markdown Authoring.",
     "icon": "logo.png",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "keywords": [
         "markdown",
         "authoring",
