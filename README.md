@@ -1,15 +1,19 @@
 # markdown-authoring
 
+Validate relative links in Markdown documents
+
 ## Install
-Launch [vscode][vscode-download-link], quick open(ctrl+p on windows, ⌘+p on mac), run "ext install markdown-authoring". Please note to enable it.
+
+Launch [VS Code][vscode-download-link], quick open (<kbd>CTRL</kbd> + <kbd>P</kbd> on Windows, <kbd>⌘</kbd> + <kbd>p</kbd> on Mac), run "ext install markdown-authoring". Please note the extension also has to be enabled.
 
 ## Features
 
 ### Relative reference link validation
 
-* Auto-diagnostic when load extension and command(alt+l) support - show invalid relative reference links as severity warnings for all markdown files in workspace. 
+* Show invalid relative reference links as warnings in the "Problem" panel for all markdown files in your workspace  
+(Runs automatically when extension is loaded and when triggered with command (<kbd>ALT</kbd> + <kbd>L</kbd>)
+* Intelligent link completion - Auto-detects when you create a link and provides suggestions for valid relative reference links based on the actual files in your workspace
 * Auto-track when edit - also diagnostic for editing markdown files.
-* Intellegence - auto-detect and provide suggestions with valid relative reference link options when edit.
 
 ## Demo
 
